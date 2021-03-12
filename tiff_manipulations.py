@@ -8,11 +8,12 @@ def read_return_hex(file_name):
 
 
 def return_byte_order(data_hex):
+    # little-endian
     if data_hex[4] == '4949':
         return 'II'
-
+    # big-endian
     elif data_hex[4] == '4D4D':
         return 'MM'
-
+    # error
     else:
         return -1
