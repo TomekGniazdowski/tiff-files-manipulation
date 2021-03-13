@@ -1,6 +1,6 @@
 import tiff_manipulations as tf
 
-data = tf.read_return_hex('nasa.tif')
+data = tf.read_return_hex('piksel.tif')
 hex_data_list = tf.str_to_hexlist(data)
 
 #print(hex_data_list)
@@ -14,7 +14,7 @@ print('Byte order:', byte_order)
 is_file_tiff = tf.is_file_tiff(hex_data_list, byte_order)
 print('Is file a tiff:', is_file_tiff)
 
-
+tf.allloop(hex_data_list, byte_order)
 # image dimensions
-dim = tf.image_dim(hex_data_list, byte_order)
-print('Image dimensions:', dim)
+#dim = tf.image_dim(hex_data_list, byte_order)
+#print('Image dimensions:', dim)
