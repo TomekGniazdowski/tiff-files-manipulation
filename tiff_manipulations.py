@@ -44,31 +44,54 @@ def is_file_tiff(data_hex_list, byte_order):
             return False
 
 
-# ****************************na razie zle
-def image_dim(data_hex_list, byte_order):
+def allloop(data_hex_list, byte_order):
+
+    width = -1
+    length = -1
+    header = int('0x0010', 16)
+    hexrange = len(data_hex_list) - 20
+    # lil endian
+    if byte_order == 0:
+        while(header < hexrange):
+            if(int(data_hex_list[header + 1] + data_hex_list[header], 16) == 0x0100):
+                width = image_width(data_hex_list, byte_order, header)
+            if(int(data_hex_list[header + 1] + data_hex_list[header], 16) == 0x0101):
+                length = image_length(data_hex_list, byte_order, header)
+            header+=12
+        print("Width is:", width)
+        print("Length is:", length)
+
+    elif byte_order == 1:
+        while (header < hexrange):
+            if (int(data_hex_list[header] + data_hex_list[header+1], 16) == 0x0100):
+                width = image_width(data_hex_list, byte_order, header)
+            if (int(data_hex_list[header] + data_hex_list[header+1], 16) == 0x0101):
+                length = image_length(data_hex_list, byte_order, header)
+            header += 12
+        print("Width is:", width)
+        print("Length is:", length)
+
+def image_width(data_hex_list, byte_order, header):
     # width
-    header_width = 0x0022
+
     if byte_order == 0:
-        width = int(data_hex_list[header_width + 1] + data_hex_list[header_width], 16)
+        return int(data_hex_list[header + 11] + data_hex_list[header+10] + data_hex_list[header+9] + data_hex_list[header+8], 16)
 
     elif byte_order == 1:
-        width = int(data_hex_list[header_width] + data_hex_list[header_width + 1], 16)
-
+        return int(data_hex_list[header+8] + data_hex_list[header + 9] + data_hex_list[header + 10] +data_hex_list[header + 11], 16)
     else:
-        width = -1
+        return -1
 
-    # length
-    header_length = 0x002E
+def image_length(data_hex_list, byte_order, header):
+    #length
+
     if byte_order == 0:
-        length = int(data_hex_list[header_length + 1] + data_hex_list[header_length], 16)
+        return int(data_hex_list[header + 11] + data_hex_list[header+10] + data_hex_list[header+9] + data_hex_list[header+8], 16)
 
     elif byte_order == 1:
-        length = int(data_hex_list[header_length] + data_hex_list[header_length + 1], 16)
+        return int(data_hex_list[header+8] + data_hex_list[header + 9] + data_hex_list[header + 10] +data_hex_list[header + 11], 16)
 
     else:
-        length = -1
-
-    return (width, length)
-
+        return -1
 
 
