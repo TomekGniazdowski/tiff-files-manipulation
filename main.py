@@ -2,7 +2,7 @@ import tiff_manipulations as tf
 import fourier as fr
 import cv2 as cv
 import matplotlib.pyplot as plt
-image = 'nasa.tif'
+image = 'kreska.tif'
 
 tiff_file = tf.Tiff_manipulations(image)
 tiff_file.read_data()
@@ -18,6 +18,10 @@ img = plt.imread(image)
 plt.imshow(img)
 plt.show()
 
-print("\n\n Usuwamy metadane: \n\n")
+print("\n\n*** Usuwamy metadane: ***\n\n")
 tiff_file.read_data(mod=1)
+tiff_file.list_data()
+
+print("\n\n*** Po usunieciu: ***\n\n")
+tiff_file.read_data()
 tiff_file.list_data()

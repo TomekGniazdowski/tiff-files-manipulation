@@ -61,7 +61,7 @@ class Tiff_manipulations:
         dictionary = vars(self)
         for element in dictionary.items():
             if type(element[1]) is int or type(element[1]) is bool or type(element[1]) is tuple:
-                print(element, "\n")
+                print(element)
         for ele in self.dic_values.items():
             if ele[1] != -2:
                 print(ele[0], ":", ele[1])
@@ -73,13 +73,17 @@ class Tiff_manipulations:
         return -1
 
     def read_data(self, mod=0):
-        for header in range(self.main_header, self.hexrange, 12):
-            key = self.find_key(self.check_header(header))
-            if key != -1 and mod == 0:
-                self.dic_values[key] = self.proper_type_place(header)
-            if key != -1 and mod == 1:
-                if self.delete_ascii(header) == -2:
-                    self.dic_values[key] = self.delete_ascii(header)
+        if mod == 0:
+            for header in range(self.main_header, self.hexrange, 12):
+                key = self.find_key(self.check_header(header))
+                if key != -1:
+                    self.dic_values[key] = self.proper_type_place(header)
+        elif mod == 1:
+            for header in range(self.main_header, self.hexrange, 12):
+                key = self.find_key(self.check_header(header))
+                if key != -1:
+                    if self.is_ascii(header) is True:
+                        self.dic_values[key] = self.delete_ascii(header)
 
     def return_byte_order(self):
         header = int('0x0000', 16)
@@ -185,18 +189,31 @@ class Tiff_manipulations:
             else:
                 return -1
 
+    def is_ascii(self, header):
+        chunk_type = self.check_type(header)
+        number_of_values = self.check_number_of_values(header)
+        if number_of_values == 1:
+            if chunk_type == 0x0002:
+                return True
+        else:
+            if chunk_type == 0x0002:
+                return True
+        return False
+
     def delete_ascii(self, header):
         chunk_type = self.check_type(header)
         number_of_values = self.check_number_of_values(header)
         if number_of_values == 1:
             if chunk_type == 0x0002:
-                self.data_hex_list[header + 8] = "00"
-                return -3
+                self.data_hex_list[header + 8] = '00'
+                return "delete"
         else:
             if chunk_type == 0x0002:
                 header_copy = int(self.return_sum(self.data_hex_list[header + 8: header + 12]), 16)
-                for d in range(8, 12):
-                    self.data_hex_list[header + d] = "00"
+                self.data_hex_list[header + 8] = '00'
+                self.data_hex_list[header + 9] = '00'
+                self.data_hex_list[header + 10] = '00'
+                self.data_hex_list[header + 11] = '00'
                 for i in range(number_of_values):
-                    self.data_hex_list[header_copy + i] = "00"
-                return -3
+                    self.data_hex_list[header_copy + i] = '00'
+                return "delete"
