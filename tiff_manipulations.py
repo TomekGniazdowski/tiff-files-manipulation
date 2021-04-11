@@ -154,6 +154,48 @@ class Tiff_manipulations:
             else:
                 return -1
 
+        if number_of_values == 2 and chunk_type in (0x0001, 0x0002, 0x0003):
+            if chunk_type == 0x0001:
+                return (chr(int(self.return_sum(self.data_hex_list[header + 8: header + 9]), 16)),
+                        chr(int(self.return_sum(self.data_hex_list[header + 9: header + 10]), 16)))
+            if chunk_type == 0x0002:
+                data_array = []
+                for i in range(number_of_values - 1):
+                    data_array.append(chr(int(self.return_sum(self.data_hex_list[header + 8 + i: header + 9 + i]), 16)))
+                return ''.join(data_array)
+            if chunk_type == 0x0003:
+                return (chr(int(self.return_sum(self.data_hex_list[header + 8: header + 10]), 16)),
+                        chr(int(self.return_sum(self.data_hex_list[header + 10: header + 12]), 16)))
+            else:
+                return -1
+
+        if number_of_values == 3 and chunk_type in (0x0001, 0x0002):
+            if chunk_type == 0x0001:
+                return (int(self.return_sum(self.data_hex_list[header + 8: header + 9]), 16),
+                        int(self.return_sum(self.data_hex_list[header + 9: header + 10]), 16),
+                        int(self.return_sum(self.data_hex_list[header + 10: header + 11]), 16))
+            if chunk_type == 0x0002:
+                data_array = []
+                for i in range(number_of_values - 1):
+                    data_array.append(chr(int(self.return_sum(self.data_hex_list[header + 8 + i: header + 9 + i]), 16)))
+                return ''.join(data_array)
+            else:
+                return -1
+
+        if number_of_values == 4 and chunk_type in (0x0001, 0x0002):
+            if chunk_type == 0x0002:
+                data_array = []
+                for i in range(number_of_values-1):
+                    data_array.append(chr(int(self.return_sum(self.data_hex_list[header + 8 + i: header + 9 + i]), 16)))
+                return ''.join(data_array)
+            if chunk_type == 0x0001:
+                return (int(self.return_sum(self.data_hex_list[header + 8: header + 9]), 16),
+                        int(self.return_sum(self.data_hex_list[header + 9: header + 10]), 16),
+                        int(self.return_sum(self.data_hex_list[header + 10: header + 11]), 16),
+                        int(self.return_sum(self.data_hex_list[header + 11: header + 12]), 16))
+            else:
+                return -1
+
         else:
             data_array = []
             if chunk_type == 0x0002:
@@ -203,17 +245,18 @@ class Tiff_manipulations:
     def delete_ascii(self, header):
         chunk_type = self.check_type(header)
         number_of_values = self.check_number_of_values(header)
-        if number_of_values == 1:
+        if number_of_values in (1, 2, 3, 4):
             if chunk_type == 0x0002:
-                self.data_hex_list[header + 8] = '00'
+                for i in range(number_of_values):
+                    self.data_hex_list[header + i + 8] = '00'
                 return "delete"
         else:
             if chunk_type == 0x0002:
                 header_copy = int(self.return_sum(self.data_hex_list[header + 8: header + 12]), 16)
-                self.data_hex_list[header + 8] = '00'
-                self.data_hex_list[header + 9] = '00'
-                self.data_hex_list[header + 10] = '00'
-                self.data_hex_list[header + 11] = '00'
+                # self.data_hex_list[header + 8] = '00'
+                # self.data_hex_list[header + 9] = '00'
+                # self.data_hex_list[header + 10] = '00'
+                # self.data_hex_list[header + 11] = '00'
                 for i in range(number_of_values):
                     self.data_hex_list[header_copy + i] = '00'
                 return "delete"
