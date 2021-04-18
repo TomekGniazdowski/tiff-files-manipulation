@@ -1,7 +1,5 @@
 import numpy as np
 import cv2 as cv
-import matplotlib.pyplot as plt
-
 
 def fourier_transform(image_name):
     img = cv.imread(image_name)
@@ -10,7 +8,11 @@ def fourier_transform(image_name):
     # transformacja fouriera
     dft = cv.dft(img_float32, flags=cv.DFT_COMPLEX_OUTPUT)
     dft_shift = np.fft.fftshift(dft)
+    dft_complex = dft_shift[:, :, 0] + 1j * dft_shift[:, :, 1]
+    dft_abs = np.abs(dft_complex) + 1
+    dft_phase = np.angle((1j * dft_shift[:, :, 1]) / dft_shift[:, :, 0], deg=True)
+
     # 20log(A)
-    magnitude_spectrum = 20 * np.log(cv.magnitude(dft_shift[:, :, 0], dft_shift[:, :, 1]) + 1)
-    # phase_spectrum = np.angle(dft_shift)
-    return magnitude_spectrum #, phase_spectrum
+    dft_bounded = 20 * np.log(dft_abs)
+    # phase_spectrum
+    return dft_bounded, dft_phase
