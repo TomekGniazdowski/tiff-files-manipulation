@@ -1,8 +1,7 @@
 import tiff_manipulations as tf
 import fourier as fr
-import cv2 as cv
 import matplotlib.pyplot as plt
-image = 'dzielo.tif'
+image = 'PIA24380.tif'
 
 tiff_file = tf.Tiff_manipulations(image)
 tiff_file.read_data()

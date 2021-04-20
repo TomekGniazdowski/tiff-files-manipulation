@@ -1,29 +1,30 @@
 class Tiff_manipulations:
     def __init__(self, file_name):
         self.dic_headers = {'width': 0x0100, 'length': 0x0101, 'bits_per_sample': 0x102, 'compression': 0x0103,
-                            'photometric_interpretation': 0x0106, 'strip_offsets': 0x0111, 'rows_per_strip': 0x0116,
-                            'strip_byte_counts': 0x0117, 'x_resolution': 0x011A, 'y_resolution': 0x011B,
-                            'resolution_unit': 0x0128, 'artist': 0x013B, 'cellLength': 0x0109, 'cellWidth': 0x0108,
-                            'colorMap': 0x0140, 'copyright': 0x8298, 'extraSamples': 0x0152,
-                            'fillOrder': 0x010A, 'freeByteCounts': 0x0121, 'freeOffsets:': 0x0120,
-                            'grayResponseCurve': 0x0123, 'grayResponseUnit': 0x0122, 'hostComputer': 0x013C,
-                            'imageDescription': 0x010E, 'make': 0x010F, 'maxSampleValue': 0x0119,
-                            'minSampleValue': 0x0118, 'model': 0x0110, 'newSubfileType': 0x00FE,
-                            'Orientation': 0x0112, 'planarConfiguration': 0x011C, 'software': 0x0131,
-                            'subFileType': 0x00FF, 'thresholding': 0x0107, 'datetime': 0x0132}
+                            'photometric_interpretation': 0x0106, 'strip_offsets': 0x0111, 'samples_per_pixel': 0x115,
+                            'rows_per_strip': 0x0116, 'strip_byte_counts': 0x0117, 'x_resolution': 0x011A,
+                            'y_resolution': 0x011B, 'resolution_unit': 0x0128, 'artist': 0x013B, 'cell_length': 0x0109,
+                            'cell_width': 0x0108, 'color_map': 0x0140, 'copyright': 0x8298, 'date_time': 0x132, 'extra_samples': 0x0152,
+                            'fill_order': 0x010A, 'free_byte_counts': 0x0121, 'free_offsets:': 0x0120,
+                            'gray_response_curve': 0x0123, 'gray_response_unit': 0x0122, 'host_computer': 0x013C,
+                            'image_description': 0x010E, 'make': 0x010F, 'max_sample_value': 0x0119,
+                            'min_sample_value': 0x0118, 'model': 0x0110, 'new_subfile_type': 0x00FE,
+                            'orientation': 0x0112, 'planar_configuration': 0x011C, 'software': 0x0131,
+                            'sub_file_type': 0x00FF, 'thresholding': 0x0107}
 
-        # self.dic_notReqHeaders = {'artist': 0x013B, 'copyright': 0x8298, 'hostComputer': 0x013C,
-        #                     'imageDescription': 0x010E, 'make': 0x010F, 'model': 0x0110, 'software': 0x0131}
+        self.list_req_fields = ['width', 'length', 'bits_per_sample', 'compression',
+                            'photometric_interpretation', 'strip_offsets', 'rows_per_strip',
+                            'strip_byte_counts', 'x_resolution', 'y_resolution', 'resolution_unit']
 
         self.dic_values = {'width': -2, 'length': -2, 'bits_per_sample': -2, 'compression': -2,
-                            'photometric_interpretation': -2, 'strip_offsets': -2, 'rows_per_strip': -2,
-                            'strip_byte_counts': -2, 'x_resolution': -2, 'y_resolution': -2,
-                            'resolution_unit': -2, 'artist': -2, 'cellLength': -2, 'cellWidth': -2,
-                            'colorMap': -2, 'copyright': -2, 'extraSamples': -2,
-                            'fillOrder': -2, 'freeByteCounts': -2, 'freeOffsets:': -2, 'grayResponseCurve': -2,
-                            'grayResponseUnit': -2, 'hostComputer': -2, 'imageDescription': -2, 'make': -2,
+                            'photometric_interpretation': -2, 'strip_offsets': -2, 'samples_per_pixel': -2,
+                            'rows_per_strip': -2, 'strip_byte_counts': -2, 'x_resolution': -2, 'y_resolution': -2,
+                            'resolution_unit': -2, 'artist': -2, 'cell_length': -2, 'cell_width': -2,
+                            'color_map': -2, 'copyright': -2, 'date_time': -2, 'extra_samples': -2,
+                            'fill_order': -2, 'free_byte_counts': -2, 'free_offsets:': -2, 'gray_response_curve': -2,
+                            'gray_response_unit': -2, 'host_computer': -2, 'image_description': -2, 'make': -2,
                             'maxSampleValue': -2, 'minSampleValue': -2, 'model': -2, 'newSubfileType': -2,
-                            'Orientation': -2, 'planarConfiguration': -2, 'software': -2, 'subFileType': -2,
+                            'orientation': -2, 'planar_configuration': -2, 'software': -2, 'sub_file_type': -2,
                             'thresholding': -2}
 
         self.str_hex = self.read_return_hex(file_name)
@@ -36,19 +37,15 @@ class Tiff_manipulations:
         self.main_header = self.offset_1 + 2
         self.hexrange = self.main_header + 12 * self.number_of_dic_entr
 
-
-
-
     def check_required_fields(self):
-        for value in self.dic_values.items():
-            if value == 0:
-                return "Błędny plik"
-        return "Plik zawiera wszystkie niezbędne informacje"
+        for req_field in self.list_req_fields:
+            if self.dic_values[req_field] == -2:
+                return False
+        return True
 
     def return_1_offset(self):
         header = int('0x0004', 16)
         sum_of_elem = int(self.return_sum(self.data_hex_list[header: header + 4]), 16)
-
         return sum_of_elem
 
     def check_header(self, header):
@@ -109,7 +106,6 @@ class Tiff_manipulations:
         return sum_of_elem
 
     def read_return_hex(self, file_name):
-        # open file, read data as bytes
         file = open(file_name, "rb")
         data = file.read()
         file.close()
@@ -183,33 +179,32 @@ class Tiff_manipulations:
                 return -1
 
         if number_of_values == 4 and chunk_type in (0x0001, 0x0002):
-            if chunk_type == 0x0002:
-                data_array = []
-                for i in range(number_of_values):
-                    data_array.append(chr(int(self.return_sum(self.data_hex_list[header + 8 + i: header + 9 + i]), 16)))
-                return ''.join(data_array)
             if chunk_type == 0x0001:
                 return (int(self.return_sum(self.data_hex_list[header + 8: header + 9]), 16),
                         int(self.return_sum(self.data_hex_list[header + 9: header + 10]), 16),
                         int(self.return_sum(self.data_hex_list[header + 10: header + 11]), 16),
                         int(self.return_sum(self.data_hex_list[header + 11: header + 12]), 16))
+            if chunk_type == 0x0002:
+                data_array = []
+                for i in range(number_of_values - 1):
+                    data_array.append(chr(int(self.return_sum(self.data_hex_list[header + 8 + i: header + 9 + i]), 16)))
+                return ''.join(data_array)
             else:
                 return -1
 
         else:
             data_array = []
-            if chunk_type == 0x0002:
-                header_copy = int(self.return_sum(self.data_hex_list[header + 8: header + 12]), 16)
-                for i in range(number_of_values - 1):
-                    data_array.append(chr(int(self.return_sum(self.data_hex_list[header_copy + i: header_copy + i +1]), 16)))
-                return ''.join(data_array)
-
             if chunk_type == 0x0001:
                 header_copy = int(self.return_sum(self.data_hex_list[header + 8: header + 12]), 16)
                 for i in range(number_of_values):
-                    data_array.append(
-                        int(self.return_sum(self.data_hex_list[header_copy + i: header_copy + i + 1]), 16))
+                    data_array.append(int(self.return_sum(self.data_hex_list[header_copy + i: header_copy + i + 1]), 16))
                 return data_array
+
+            if chunk_type == 0x0002:
+                header_copy = int(self.return_sum(self.data_hex_list[header + 8: header + 12]), 16)
+                for i in range(number_of_values - 1):
+                    data_array.append(chr(int(self.return_sum(self.data_hex_list[header_copy + i: header_copy + i + 1]), 16)))
+                return ''.join(data_array)
 
             if chunk_type == 0x0003:
                 number_of_values = 2 * number_of_values
@@ -243,16 +238,12 @@ class Tiff_manipulations:
         number_of_values = self.check_number_of_values(header)
         if number_of_values in (1, 2, 3, 4):
             if chunk_type == 0x0002:
-                for i in range(number_of_values):
+                for i in range(number_of_values-1):
                     self.data_hex_list[header + i + 8] = '00'
                 return "delete"
         else:
             if chunk_type == 0x0002:
                 header_copy = int(self.return_sum(self.data_hex_list[header + 8: header + 12]), 16)
-                # self.data_hex_list[header + 8] = '00'
-                # self.data_hex_list[header + 9] = '00'
-                # self.data_hex_list[header + 10] = '00'
-                # self.data_hex_list[header + 11] = '00'
                 for i in range(number_of_values-1):
                     self.data_hex_list[header_copy + i] = '00'
                 return "delete"
